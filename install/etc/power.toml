@@ -1,0 +1,6 @@
+com='/dev/ttyS1'
+#波特率、数据数据位、停止位、奇偶校验模式模式 0无 1奇校验 2偶校验
+baudrate=9600
+databits=8
+stopbits=1
+paritymode=0

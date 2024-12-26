@@ -1,0 +1,91 @@
+[common]
+#管理数据
+id='某村'
+uint='某镇'
+#传感器数量
+iotnumber=2
+datadir='/mnt/sd'
+
+[iots]
+[iots.1]
+#管理数据
+id='雨量计1'
+type='08'
+#采集频度
+#cron='@every 30s'
+cron='0 * * * * *'
+
+#读取数据
+com=1
+#波特率、数据数据位、停止位、奇偶校验模式模式 0无 1奇校验 2偶校验
+baudrate=9600
+databits=8
+stopbits=1
+paritymode=0
+
+read_buff='040300000001845f'
+read_len=8
+read_delay=200
+recive_len=7
+
+revive_data_len=2
+#数据
+#最高字节-------------最低字节
+#data1--data2--data3--data4 (4字节)
+#data1--data2               (2字节)
+#data1                      (1字节)
+revive_data=[3,4]
+#revive_data2=4
+#revive_data3=0
+#revive_data4=0
+
+#计算偏移量
+ratio=0.1
+offset=true
+
+#CRC16 XOR
+crc='CRC16'
+
+[iots.2]
+id='电表1'
+type='08'
+cron='30 * * * * *'
+
+com=1
+baudrate=9600
+databits=8
+stopbits=1
+paritymode=2
+
+read_buff='010300000001840A'
+read_len=8
+read_delay=500
+recive_len=7
+revive_data_len=2
+revive_data=[3,4]
+#revive_data2=4
+#revive_data3=0
+#revive_data4=0
+
+ratio=0.1
+offset=true
+#CRC16 XOR
+crc='CRC16'
+
+
+[mqtt]
+#用common.unit-common.id(iot1.id,iotn.id)表示 clientid = '某镇-某村(雨量计1,雨量计2)'
+
+#host = 'tcp://192.168.1.128:5003'
+host = '192.168.1.128'
+port = 5003
+password = 'password'
+username = 'user'
+
+[webapi]
+url = "http://192.168.1.128:8080//webinsert"
+
+
+[socket]
+ip='192.168.1.128'
+port=5001

@@ -1,0 +1,7 @@
+host = '192.168.1.128'
+port = 5003
+pubtoptic = '/public/user'
+password = 'password'
+username = 'user'
+
+used = true

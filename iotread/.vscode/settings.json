@@ -1,0 +1,8 @@
+{
+    "go.toolsEnvVars": {
+        "GOOS": "linux",
+        "GOARCH": "arm",
+        "GOARM": "5",
+        "GOPROXY": "https://goproxy.cn,direct"
+    }
+}

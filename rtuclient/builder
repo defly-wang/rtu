@@ -1,0 +1,4 @@
+#/sbin/bash
+GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" -o rtuclient
+cp rtuclient ../install/bin/rtuclient.new
+#upx rtuclient

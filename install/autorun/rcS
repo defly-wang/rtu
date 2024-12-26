@@ -1,0 +1,67 @@
+#!/bin/sh
+
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+runlevel=S
+prevlevel=N
+umask 022
+export PATH runlevel prevlevel
+
+#
+#	Trap CTRL-C &c only in this shell so we can interrupt subprocesses.
+#
+
+hostname -F /etc/sysconfig/HOSTNAME
+
+mount -n -t proc none /proc
+mount -n -t sysfs none /sys
+mount -t tmpfs tmpfs /run -o size=1m
+
+mount -t tmpfs tmpfs /mnt/sd -o ro,size=4k
+mount -t tmpfs tmpfs /mnt/udisk -o ro,size=4k
+
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+/sbin/mdev -s
+# mounting file system specified in /etc/fstab
+mkdir -p /dev/pts
+mkdir -p /dev/shm
+mount -n -t devpts none /dev/pts -o mode=0622
+mount -n -t tmpfs tmpfs /dev/shm
+mount -n -t ramfs none /tmp
+mount -n -t ramfs none /var
+mkdir -p /var/empty
+mkdir -p /var/log
+mkdir -p /var/lock
+mkdir -p /var/run
+mkdir -p /var/tmp
+
+hwclock -u -s
+
+echo V > /dev/watchdog
+
+syslogd
+
+/etc/rc.d/init.d/netd start
+/usr/local/bin/sshd
+/usr/boa/bin/boa
+sleep 1
+
+mount -t yaffs2 /dev/mtdblock0 /mnt/yaffs2
+
+sethtinfo
+
+ifconfig lo 127.0.0.1
+/etc/htnet/dns/setdns.script
+/etc/htnet/ifconfig-eth0
+#/etc/htnet/ifconfig-wlan0 auto &
+
+free_arp &
+sysrst &
+
+4g_server &
+
+#2gControl &
+#2g_phone &
+
+source /opt/rtu/start
+

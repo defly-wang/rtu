@@ -1,0 +1,4 @@
+#/sbin/bash
+GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" -o rtucgi.cgi 
+#upx rtucgi.cgi
+cp rtucgi.cgi ../install/cgi/rtucgi.cgi.new

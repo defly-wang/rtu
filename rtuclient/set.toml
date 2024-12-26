@@ -1,0 +1,17 @@
+#使用单位
+unit='yeda'
+id="370701"
+mac='54:26:96:d1:ef:d9'
+sn=‘A240801001'
+
+configfile='config.toml'
+
+[server]
+address="192.168.1.128"
+port=50080
+#心跳延迟 分钟
+signaldelay=1
+#连接重试延迟 秒
+retrydelay=5
+watchdog=true
+
