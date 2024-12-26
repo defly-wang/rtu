@@ -1,4 +1,10 @@
-#/sbin/bash
+#/bin/bash
+
+# 设置目标操作系统和架构，并编译Go程序
 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" -o rtucgi.cgi 
+
+# 压缩可执行文件（可选）
 #upx rtucgi.cgi
+
+# 将编译后的文件复制到目标目录
 cp rtucgi.cgi ../install/cgi/rtucgi.cgi.new
