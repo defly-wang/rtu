@@ -12,21 +12,10 @@ import (
 
 const VERSION = "1.0.0"
 
-// var UNIX_SOCKET_NAME = "@IOTREAD_SOCKET"
 var recivebuff = make([]byte, 1024)
 
 func main() {
 
-	//fmt.Println(config.LoadIotHelp())
-	//fmt.Println(config.LoadIotOrg())
-	/*
-		fmt.Println(hex.EncodeToString(config.MakeSerialReadCmd(config.SignalRead{
-			Add:     1,
-			Cmd:     4,
-			DataAdd: 0,
-			DataLen: 1,
-		})))
-	*/
 	if len(os.Args) > 1 {
 		fmt.Println(VERSION)
 		os.Exit(0)
@@ -49,11 +38,6 @@ func main() {
 		os.Exit(0)
 	}()
 
-	/*
-		defer func() {
-			config.RemovePid(config.RtuclientPid)
-		}()
-	*/
 	//go config.StartPprof(":6060")
 	//fmt.Println(config.GetPid(config.RtuclientPid))
 
@@ -61,16 +45,9 @@ func main() {
 	//setting = config.GetSetting()
 
 	//断线重连
-	//go
-	//发送心跳
 
-	//iots := config.GetIots(common.GetConfigFileName())
-	//fmt.Println(b)
-	//iots[0].Id = "ASD"
-	//b[len(b)-1].Id = "ASDASD"
-
-	//config.SaveIots(iots)
 	//go StartPprof()
+
 	go NtpClock()
 
 	go HeartbeatSignal()
@@ -87,14 +64,11 @@ func main() {
 			go config.Led2On()
 		}
 
-		//conn.SetReadDeadline(time.)
-		//conn.SetReadDeadline(time.Now().Add(3 * time.Second))
-
 		//recivebuff := make([]byte, 1024)
 		n, err := conn.Read(recivebuff)
 		if err != nil {
 			setConnected(false)
-			//fmt.Println("----")
+
 			conn.Close()
 			continue
 		}
