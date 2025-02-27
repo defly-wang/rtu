@@ -3,4 +3,6 @@ go 1.22
 use config
 use iotread
 use rtucgi
+use rtuclient
+use control-server
 
