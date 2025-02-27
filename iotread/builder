@@ -1,6 +1,12 @@
-#/sbin/bash
+#/bin/bash
+
+# 设置目标平台为 Linux ARM 架构
 #CGO_ENABLED=1 CC=arm-linux-gnueabi-gcc 
 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" -o iotread 
 #  --extldflags "-static -fpic"' -o iotread 
+
+# 将生成的二进制文件复制到安装目录
 cp iotread ../install/bin/iotread.new
+
+# 压缩二进制文件以减小体积（当前被注释掉）
 #upx iotread
