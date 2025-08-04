@@ -36,7 +36,11 @@ func MqttClose() {
 func MqttPublicInfo(toptic string, jsondata string) bool {
 
 	if !mtqqClient.IsConnected() {
-		return false
+		//断线重联
+		if !MqttInit() {
+			return false
+		}
+		//return false
 	}
 	//fmt.Println(string(jsondata))
 
