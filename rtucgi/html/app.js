@@ -11,25 +11,25 @@
     el.textContent = text;
     el.classList.remove("hidden");
   }
-  function hideMsg(id) {
+function hideMsg(id) {
     var el = $(id);
     el.classList.add("hidden");
     el.textContent = "";
   }
-  function fmtBool(b) { return b ? "是" : "否"; }
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
+  function showToast(text, type) {
+    var el = $("toast");
+    el.textContent = text;
+    el.className = "toast " + (type || "info");
+    el.classList.remove("hidden");
+    var close = document.createElement("span");
+    close.className = "toast-close";
+    close.textContent = "×";
+    close.addEventListener("click", function () { el.classList.add("hidden"); });
+    el.appendChild(close);
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function () { el.classList.add("hidden"); }, 5000);
   }
-  function kvItem(label, value) {
-    return '<div class="kv-item"><div class="kv-label">' + esc(label) + '</div><div class="kv-value">' + esc(value) + "</div></div>";
-  }
-  function datetimeLocalToStr(dt) {
-    if (!dt) return "";
-    return dt.replace("T", " ");
-  }
-  function showGlobal(text, type) { showMsg("test-msg", text, type); }
+  function showGlobal(text, type) { showToast(text, type); }
 
   /* ================= 登录 ================= */
   function doLogin() {
