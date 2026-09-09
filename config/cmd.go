@@ -22,6 +22,10 @@ const (
 
 	//获取/设置基本设置 para=CMD_PARA_GET，edit
 	CMD_Base = "base"
+
+	//获取/设置网络设置 para=CMD_PARA_GET，edit
+	CMD_Network = "network"
+
 	//获取/设置Mqtt设置 para=CMD_PARA_GET，edit
 	CMD_Mqtt = "mqtt"
 	//获取/设置Webapi设置 para=CMD_PARA_GET，edit
