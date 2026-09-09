@@ -62,8 +62,19 @@ function hideMsg(id) {
 
   /* ================= 导航 ================= */
   var currentPage = "info";
+  var pageTimers = { info: null, status: null, iot: null };
+  function clearTimers() {
+    Object.keys(pageTimers).forEach(function (k) {
+      if (pageTimers[k]) { clearInterval(pageTimers[k]); pageTimers[k] = null; }
+    });
+  }
+  function scheduleAutoRefresh(page, fn, ms) {
+    if (pageTimers[page]) clearInterval(pageTimers[page]);
+    pageTimers[page] = setInterval(fn, ms);
+  }
   function navigate(page) {
     currentPage = page;
+    clearTimers();
     document.querySelectorAll("#nav .nav-item").forEach(function (a) {
       a.classList.toggle("active", a.dataset.page === page);
     });
@@ -75,59 +86,116 @@ function hideMsg(id) {
 
   function loadPage(page) {
     switch (page) {
-      case "info": loadInfo(); break;
-      case "status": loadStatus(); break;
+      case "info": loadInfo(); scheduleAutoRefresh("info", loadInfo, 60000); break;
+      case "status": loadStatus(); scheduleAutoRefresh("status", loadStatus, 30000); break;
       case "base": loadBase(); break;
       case "mqtt": loadMqtt(); break;
       case "webapi": loadWebapi(); break;
-      case "iot": loadIotList(); break;
+      case "iot": loadIotList(); scheduleAutoRefresh("iot", loadIotList, 60000); break;
       case "power": break; /* 由按钮触发 */
       case "his": loadHis(); break;
       case "test": break;
     }
   }
 
+  /* ================= 格式化工具 ================= */
+  function fmtBytes(v) {
+    v = Number(v) || 0;
+    if (v >= 1073741824) return (v / 1073741824).toFixed(2) + " GB";
+    if (v >= 1048576) return (v / 1048576).toFixed(1) + " MB";
+    if (v >= 1024) return (v / 1024).toFixed(1) + " KB";
+    return v + " B";
+  }
+  function fmtUptime(s) {
+    s = Math.floor(Number(s) || 0);
+    var d = Math.floor(s / 86400);
+    var h = Math.floor((s % 86400) / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var str = "";
+    if (d) str += d + "天";
+    if (h || d) str += h + "小时";
+    str += m + "分";
+    return str;
+  }
+  function fmtDur(starttime) {
+    if (!starttime) return "-";
+    var t = new Date(String(starttime).replace(" ", "T"));
+    if (isNaN(t.getTime())) return "-";
+    return fmtUptime((Date.now() - t.getTime()) / 1000);
+  }
+  function nowStr() {
+    function p(x) { return (x < 10 ? "0" : "") + x; }
+    var d = new Date();
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) +
+      " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
+
   /* ================= 系统信息 ================= */
-  var sysinfoLabels = {
-    read_version: "采集程序版本", rtu_version: "客户端程序版本", cgi_version: "Web 管理版本",
-    version: "系统版本", uptime: "运行时间 (秒)", memtotal: "内存总量", memfree: "空闲内存",
-    disktotal: "磁盘总量", diskfree: "磁盘剩余", mac: "MAC 地址", ip: "IP 地址",
-    gprs_ip: "4G 内网 IP", gprs_imsi: "4G IMSI", gprs_ccid: "4G CCID", gprs_csq: "4G 信号强度"
-  };
   function loadInfo() {
     API.getInfo().then(function (d) {
-      var html = "";
-      for (var k in sysinfoLabels) {
-        if (d.data && d.data[k] !== undefined) html += kvItem(sysinfoLabels[k], d.data[k]);
+      var s = d.data || {};
+      function section(title, items) {
+        var html = '<div class="card"><h3>' + esc(title) + '</h3><div class="kv-grid">';
+        items.forEach(function (it) { html += kvItem(it[0], it[1]()); });
+        html += '</div></div>';
+        return html;
       }
+      var html = "";
+      html += section("版本信息", [
+        ["系统版本", function () { return s.version; }],
+        ["采集程序", function () { return s.read_version; }],
+        ["客户端程序", function () { return s.rtu_version; }],
+        ["Web 管理", function () { return s.cgi_version; }]
+      ]);
+      html += section("运行与资源", [
+        ["已运行时间", function () { return fmtUptime(s.uptime); }],
+        ["内存总量", function () { return fmtBytes(s.memtotal); }],
+        ["空闲内存", function () { return fmtBytes(s.memfree); }],
+        ["磁盘总量", function () { return fmtBytes(s.disktotal); }],
+        ["磁盘剩余", function () { return fmtBytes(s.diskfree); }],
+        ["存储使用率", function () {
+          return s.disktotal ? (Math.round((1 - s.diskfree / s.disktotal) * 1000) / 10) + "%" : "-";
+        }]
+      ]);
+      html += section("网络", [
+        ["MAC 地址", function () { return s.mac; }],
+        ["IP 地址", function () { return s.ip; }],
+        ["4G 内网 IP", function () { return s.gprs_ip; }]
+      ]);
+      html += section("4G 通信", [
+        ["IMSI", function () { return s.gprs_imsi; }],
+        ["CCID (SIM 卡号)", function () { return s.gprs_ccid; }],
+        ["信号强度 CSQ", function () { return s.gprs_csq; }]
+      ]);
       $("info-body").innerHTML = html;
-    }).catch(function (e) { $("info-body").innerHTML = '<div class="msg error">' + esc(e.message) + "</div>"; });
+    }).catch(function (e) {
+      $("info-body").innerHTML = '<div class="msg error">' + esc(e.message) + "</div>";
+    });
   }
 
   /* ================= 运行状态 ================= */
-  var statusLabels = {
-    starttime: "启动时间", count: "采集次数", readcount: "读取成功次数",
-    mqttcount: "MQTT 发送次数", webapicount: "WebAPI 发送次数",
-    runing: "运行状态", version: "程序版本"
-  };
-  function fmtStatus(d) {
-    var copy = {};
-    for (var k in d) {
-      if (k === "runing") copy[k] = d[k] ? "运行中" : "未运行";
-      else copy[k] = d[k];
-    }
-    return copy;
-  }
   function loadStatus() {
     API.getStatus().then(function (d) {
-      var html = "";
       var s = d.data || {};
-      var f = fmtStatus(s);
-      for (var k in statusLabels) {
-        if (f[k] !== undefined) html += kvItem(statusLabels[k], f[k]);
+      var html = "";
+      if (!s.runing) {
+        html += '<div class="msg error">采集程序（iotread）未运行，无法正常采集数据。</div>';
+      } else {
+        html += '<div class="msg success">采集程序运行中</div>';
       }
+      html += '<div class="card"><div class="kv-grid">';
+      html += kvItem("启动时间", s.starttime);
+      html += kvItem("已运行时长", fmtDur(s.starttime));
+      html += kvItem("采集总次数", s.count);
+      html += kvItem("读取成功次数", s.readcount);
+      html += kvItem("MQTT 发送次数", s.mqttcount);
+      html += kvItem("WebAPI 发送次数", s.webapicount);
+      html += kvItem("程序版本", s.version);
+      html += '</div></div>';
       $("status-body").innerHTML = html;
-    }).catch(function (e) { $("status-body").innerHTML = '<div class="msg error">' + esc(e.message) + "</div>"; });
+    }).catch(function (e) {
+      $("status-body").innerHTML = '<div class="msg error">' + esc(e.message) + "</div>";
+    });
   }
 
   /* ================= 基础设置 ================= */
@@ -194,21 +262,34 @@ function hideMsg(id) {
   function loadIotList() {
     API.getIots().then(function (d) {
       var list = d.data || [];
-      var rows = "";
-      list.forEach(function (iot) {
-        rows += "<tr>" +
-          "<td>" + iot.iot + "</td>" +
-          "<td>" + esc(iot.id) + "</td>" +
-          "<td>" + esc(iot.type) + "</td>" +
-          "<td>ttyS" + esc(iot.com) + "</td>" +
-          "<td class='mono'>" + esc(iot.cron) + "</td>" +
-          "<td>" + (iot.crc ? "已配置" : "-") + "</td>" +
-          "<td>" +
-            "<button class='btn btn-secondary btn-sm' onclick='App.editIotFromList(" + iot.iot + ")'>编辑</button> " +
-            "<button class='btn btn-danger btn-sm' onclick='App.delIotFromList(" + iot.iot + ")'>删除</button>" +
-          "</td></tr>";
+      var latests = list.map(function (iot) {
+        return API.getHisOne(iot.iot, nowStr()).then(function (r) {
+          iot._latest = r.data || null;
+        }).catch(function () { iot._latest = null; });
       });
-      $("iot-list").querySelector("tbody").innerHTML = rows;
+      return Promise.all(latests).then(function () {
+        var rows = "";
+        list.forEach(function (iot) {
+          var latest = iot._latest;
+          var hasData = latest && latest.time && String(latest.time).indexOf("0001-") !== 0 && latest.rawdata;
+          var valCell = hasData
+            ? latest.value + "<div class='small'>" + esc(latest.time) + "</div>"
+            : '<span class="warn-text">无数据</span>';
+          rows += "<tr>" +
+            "<td>" + iot.iot + "</td>" +
+            "<td>" + esc(iot.id) + "</td>" +
+            "<td>" + esc(iot.type) + "</td>" +
+            "<td>ttyS" + esc(iot.com) + "</td>" +
+            "<td class='mono'>" + esc(iot.cron) + "</td>" +
+            "<td>" + valCell + "</td>" +
+            "<td class='mono small'>" + (hasData ? esc(latest.rawdata) : "") + "</td>" +
+            "<td>" +
+              "<button class='btn btn-secondary btn-sm' onclick='App.editIotFromList(" + iot.iot + ")'>编辑</button> " +
+              "<button class='btn btn-danger btn-sm' onclick='App.delIotFromList(" + iot.iot + ")'>删除</button>" +
+            "</td></tr>";
+        });
+        $("iot-list").querySelector("tbody").innerHTML = rows;
+      });
     }).catch(function (e) { showGlobal(e.message, "error"); });
   }
 
