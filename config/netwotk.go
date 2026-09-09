@@ -77,7 +77,7 @@ func SaveNetworkConfig(cfg NetworkConfig) bool {
 		return false
 	}
 
-	_, err = writer.WriteString("MAC=" + cfg.Mac + "\n")
+	_, err = writer.WriteString("MAC=" + oldCfg.Mac + "\n")
 	if err != nil {
 		return false
 	}
