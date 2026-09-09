@@ -9,12 +9,12 @@ import (
 
 func Network(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		cfg, ok := config.GetNetworkConfig()
-		if ok != nil {
+		cfg, err := config.GetNetworkConfig()
+		if err == nil {
 			common.ResponseInfo(w, cfg)
 
 		} else {
-			common.ResponseFailInfo(w, "读取配置失败！")
+			common.ResponseFailInfo(w, err.Error())
 		}
 
 	} else if r.Method == "POST" {
