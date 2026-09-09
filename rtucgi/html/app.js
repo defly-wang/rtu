@@ -100,6 +100,7 @@ function hideMsg(id) {
       case "info": loadInfo(); scheduleAutoRefresh("info", loadInfo, 60000); break;
       case "status": loadStatus(); scheduleAutoRefresh("status", loadStatus, 30000); break;
       case "base": loadBase(); break;
+      case "network": loadNetwork(); break;
       case "mqtt": loadMqtt(); break;
       case "webapi": loadWebapi(); break;
       case "iot": loadIotList(); scheduleAutoRefresh("iot", loadIotList, 60000); break;
@@ -236,6 +237,21 @@ function hideMsg(id) {
       datadir: val("base-datadir")
     };
     return API.saveBase(d);
+  }
+
+  /* ================= 网络设置 ================= */
+  function loadNetwork() {
+    API.getNetwork().then(function (d) {
+      var n = d.data || {};
+      setVal("net-ip", n.ip);
+      setVal("net-mask", n.mask);
+      setVal("net-gateway", n.gateway);
+    }).catch(function (e) { showGlobal(e.message, "error"); });
+  }
+  function saveNetwork() {
+    return API.saveNetwork({
+      ip: val("net-ip"), mask: val("net-mask"), gateway: val("net-gateway")
+    });
   }
 
   /* ================= MQTT 设置 ================= */
@@ -504,7 +520,7 @@ function hideMsg(id) {
 
     window.addEventListener("hashchange", function () {
       var page = (location.hash || "").replace("#/", "") || "info";
-      if (["info", "status", "base", "mqtt", "webapi", "iot", "power", "his", "test"].indexOf(page) >= 0) {
+      if (["info", "status", "base", "network", "mqtt", "webapi", "iot", "power", "his", "test"].indexOf(page) >= 0) {
         navigate(page);
       }
     });
@@ -513,6 +529,9 @@ function hideMsg(id) {
     $("status-refresh").addEventListener("click", loadStatus);
     $("base-save").addEventListener("click", function () {
       saveBase().then(function () { showGlobal("基础设置保存成功", "success"); }).catch(function (e) { showGlobal(e.message, "error"); });
+    });
+    $("net-save").addEventListener("click", function () {
+      saveNetwork().then(function () { showGlobal("网络设置保存成功（重启生效）", "success"); }).catch(function (e) { showGlobal(e.message, "error"); });
     });
     $("mqtt-save").addEventListener("click", function () {
       saveMqtt().then(function () { showGlobal("MQTT 设置保存成功", "success"); }).catch(function (e) { showGlobal(e.message, "error"); });
@@ -614,7 +633,7 @@ function hideMsg(id) {
   function bootstrap() {
     bindEvents();
     var page = (location.hash || "").replace("#/", "") || "info";
-    if (["info", "status", "base", "mqtt", "webapi", "iot", "power", "his", "test"].indexOf(page) >= 0) {
+    if (["info", "status", "base", "network", "mqtt", "webapi", "iot", "power", "his", "test"].indexOf(page) >= 0) {
       enterMain();
       navigate(page);
     } else {

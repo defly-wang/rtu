@@ -109,6 +109,10 @@ var API = (function () {
   function getBase()   { return request("base"); }
   function saveBase(d) { return request("base", null, "POST", d); }
 
+  /* ---------- 网络设置 network ---------- */
+  function getNetwork()   { return request("network"); }
+  function saveNetwork(d) { return request("network", null, "POST", d); }
+
   /* ---------- MQTT ---------- */
   function getMqtt()   { return request("mqtt"); }
   function saveMqtt(d) { return request("mqtt", null, "POST", d); }
@@ -151,6 +155,7 @@ var API = (function () {
   return {
     login: login,
     getBase: getBase, saveBase: saveBase,
+    getNetwork: getNetwork, saveNetwork: saveNetwork,
     getMqtt: getMqtt, saveMqtt: saveMqtt,
     getWebapi: getWebapi, saveWebapi: saveWebapi,
     getIots: getIots, getIot: getIot,

@@ -61,6 +61,8 @@ func main() {
 			event.Status(w, r)
 		case config.CMD_Base:
 			event.Base(w, r)
+		case config.CMD_Network:
+			event.Network(w, r)
 		case config.CMD_Mqtt:
 			event.Mqtt(w, r)
 		case config.CMD_Webapi:

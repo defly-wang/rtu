@@ -37,6 +37,7 @@
       <a href="#/info" data-page="info" class="nav-item active">系统信息</a>
       <a href="#/status" data-page="status" class="nav-item">运行状态</a>
       <a href="#/base" data-page="base" class="nav-item">基础设置</a>
+      <a href="#/network" data-page="network" class="nav-item">网络设置</a>
       <a href="#/mqtt" data-page="mqtt" class="nav-item">MQTT 设置</a>
       <a href="#/webapi" data-page="webapi" class="nav-item">WebAPI 设置</a>
       <a href="#/iot" data-page="iot" class="nav-item">传感器管理</a>
@@ -70,6 +71,17 @@
         <div class="form-row"><label>传感器数量 (iotnumber)</label><input type="number" id="base-iotnumber" min="0"></div>
         <div class="form-row"><label>数据存储目录 (datadir)</label><input type="text" id="base-datadir"></div>
         <div class="form-row"><button id="base-save" class="btn btn-primary">保存</button></div>
+      </div>
+    </div>
+
+    <div id="page-network" class="page hidden">
+      <h2>网络设置</h2>
+      <div class="form card">
+        <div class="form-row"><label>IP 地址 (ip)</label><input type="text" id="net-ip" placeholder="如:192.168.1.100"></div>
+        <div class="form-row"><label>子网掩码 (mask)</label><input type="text" id="net-mask" placeholder="如:255.255.255.0"></div>
+        <div class="form-row"><label>网关 (gateway)</label><input type="text" id="net-gateway" placeholder="如:192.168.1.1"></div>
+        <div class="form-row"><button id="net-save" class="btn btn-primary">保存</button></div>
+        <div class="msg info">提示：配置保存在 /mnt/yaffs2/net.conf，保存后需重启设备方可生效，请谨慎修改。</div>
       </div>
     </div>
 
