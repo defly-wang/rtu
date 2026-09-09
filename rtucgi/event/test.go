@@ -29,7 +29,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 			}
 			iotinfo, errr := config.TestReadSirial(iotcfg)
 			if errr != nil {
-				common.ResponseFailInfo(w, "读取测试错误！")
+				common.ResponseFailInfo(w, errr.Error())
 				return
 			}
 			common.ResponseInfo(w, iotinfo)

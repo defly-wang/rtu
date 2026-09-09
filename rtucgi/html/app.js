@@ -381,9 +381,11 @@ function hideMsg(id) {
     var d = collectIotForm();
     if (isNaN(d.iot)) { showMsg("iot-edit-msg", "请输入传感器编号", "error"); return; }
     API.testRead(d).then(function (r) {
-      var info = r.data;
-      setVal("iot-readbuff", info.rawdata || "");
-      showMsg("iot-edit-msg", "读取成功 原始数据: " + (info.rawdata || ""), "success");
+      var info = r.data || {};
+      showMsg("iot-edit-msg",
+        "读取成功：数值 " + info.value +
+        "，时间 " + (info.time || "-") +
+        "，原始数据 " + (info.rawdata || "-"), "success");
     }).catch(function (e) { showMsg("iot-edit-msg", "读取失败: " + e.message, "error"); });
   }
 

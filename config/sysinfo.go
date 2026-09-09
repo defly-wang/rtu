@@ -52,7 +52,7 @@ func GetSysInfo() Sysinfo {
 				ipnet, _ := ad.(*net.IPNet)
 				if ipnet.IP.To4() != nil {
 					info.Ip = ad.String()
-					info.Mask = ipnet.Mask.String()
+					info.Mask = net.IP(ipnet.Mask).String()
 					info.Gateway = GetGateway()
 				}
 			}
