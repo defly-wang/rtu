@@ -178,6 +178,8 @@ function hideMsg(id) {
       html += section("网络", [
         ["MAC 地址", function () { return valOrDash(s.mac); }],
         ["IP 地址", function () { return cleanIp(s.ip); }],
+        ["子网掩码", function () { return valOrDash(s.mask); }],
+        ["网关", function () { return valOrDash(s.gateway); }],
         ["4G 内网 IP", function () { return valOrDash(s.gprs_ip); }]
       ]);
       var has4g = s.gprs_imsi || s.gprs_ccid || s.gprs_csq;

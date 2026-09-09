@@ -12,6 +12,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/jackpal/gateway"
 )
 
 type Sysinfo struct {
@@ -26,6 +28,8 @@ type Sysinfo struct {
 	DiskFree      uint64 `json:"diskfree"`
 	Mac           string `json:"mac"`
 	Ip            string `json:"ip"`
+	Mask          string `json:"mask"`
+	Gateway       string `json:"gateway"`
 	Gprs_ip       string `json:"gprs_ip"`
 	Gpis_imsi     string `json:"gprs_imsi"`
 	Gpis_ccid     string `json:"gprs_ccid"`
@@ -48,6 +52,8 @@ func GetSysInfo() Sysinfo {
 				ipnet, _ := ad.(*net.IPNet)
 				if ipnet.IP.To4() != nil {
 					info.Ip = ad.String()
+					info.Mask = ipnet.Mask.String()
+					info.Gateway = GetGateway()
 				}
 			}
 		}
@@ -106,6 +112,14 @@ func GetSysInfo() Sysinfo {
 	info.DiskFree = Disk.Bfree * uint64(Disk.Bsize)
 
 	return info
+}
+
+func GetGateway() string {
+	gw, err := gateway.DiscoverGateway()
+	if err != nil {
+		return ""
+	}
+	return gw.String()
 }
 
 func getLinuxVersion() (string, error) {

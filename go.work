@@ -1,9 +1,13 @@
-go 1.22
+go 1.26.2
 
 use config
-use iotread
-use rtucgi
-use rtuclient
-use control-server
-use alarm
 
+use iotread
+
+use rtucgi
+
+use rtuclient
+
+use control-server
+
+use alarm

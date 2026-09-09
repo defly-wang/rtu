@@ -78,7 +78,7 @@ body {
 
 .sidebar-foot { padding: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
 
-.content { flex: 1; padding: 24px 32px; max-width: 1100px; }
+.content { flex: 1; padding: 24px 32px; max-width: 1100px; min-width: 0; }
 
 .page h2 { margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 8px; }
 .page h3 { margin-bottom: 16px; font-size: 16px; }
@@ -136,6 +136,7 @@ label + input, label + select { width: 100%; }
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 16px;
+  overflow: hidden;
 }
 
 .table {
@@ -160,18 +161,21 @@ label + input, label + select { width: 100%; }
 /* ========== 键值展示 ========== */
 .kv-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 10px;
   margin-top: 16px;
+  width: 100%;
 }
 .kv-item {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px 14px;
+  min-width: 0;
+  text-align: center;
 }
 .kv-item .kv-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.kv-item .kv-value { font-size: 15px; word-break: break-all; }
+.kv-item .kv-value { font-size: 15px; word-break: break-all; overflow-wrap: break-word; }
 
 /* ========== 消息 ========== */
 .msg { padding: 10px 14px; border-radius: 6px; margin-top: 12px; font-size: 13px; }
