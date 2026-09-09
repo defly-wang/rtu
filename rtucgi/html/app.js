@@ -31,6 +31,17 @@ function hideMsg(id) {
   }
   function showGlobal(text, type) { showToast(text, type); }
 
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function kvItem(label, value) {
+    return '<div class="kv-item"><div class="kv-label">' + esc(label) +
+      '</div><div class="kv-value">' + esc(value) + "</div></div>";
+  }
+  function fmtBool(b) { return b ? "是" : "否"; }
+
   /* ================= 登录 ================= */
   function doLogin() {
     var u = val("login-user"), p = val("login-pass");
