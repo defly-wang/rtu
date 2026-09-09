@@ -243,6 +243,8 @@ function hideMsg(id) {
   function loadNetwork() {
     API.getNetwork().then(function (d) {
       var n = d.data || {};
+      setVal("net-method", n.Method || n.method || "");
+      setVal("net-mac", n.Mac || n.mac || "");
       setVal("net-ip", n.ip);
       setVal("net-mask", n.mask);
       setVal("net-gateway", n.gateway);

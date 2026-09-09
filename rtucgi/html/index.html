@@ -77,9 +77,11 @@
     <div id="page-network" class="page hidden">
       <h2>网络设置</h2>
       <div class="form card">
+        <div class="form-row"><label>IP 获取方式 (method)</label><input type="text" id="net-method" class="readonly" readonly></div>
         <div class="form-row"><label>IP 地址 (ip)</label><input type="text" id="net-ip" placeholder="如:192.168.1.100"></div>
         <div class="form-row"><label>子网掩码 (mask)</label><input type="text" id="net-mask" placeholder="如:255.255.255.0"></div>
         <div class="form-row"><label>网关 (gateway)</label><input type="text" id="net-gateway" placeholder="如:192.168.1.1"></div>
+        <div class="form-row"><label>MAC 地址 (mac)</label><input type="text" id="net-mac" class="readonly" readonly></div>
         <div class="form-row"><button id="net-save" class="btn btn-primary">保存</button></div>
         <div class="msg info">提示：配置保存在 /mnt/yaffs2/net.conf，保存后需重启设备方可生效，请谨慎修改。</div>
       </div>

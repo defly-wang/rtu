@@ -126,6 +126,13 @@ input, select {
 }
 input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
 
+input.readonly, input[readonly] {
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
 label + input, label + select { width: 100%; }
 
 .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
