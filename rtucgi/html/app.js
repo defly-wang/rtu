@@ -123,6 +123,9 @@ function hideMsg(id) {
     if (isNaN(t.getTime())) return "-";
     return fmtUptime((Date.now() - t.getTime()) / 1000);
   }
+  function valOrDash(v) {
+    return (v === "" || v === null || v === undefined) ? "无" : v;
+  }
   function nowStr() {
     function p(x) { return (x < 10 ? "0" : "") + x; }
     var d = new Date();
@@ -141,16 +144,20 @@ function hideMsg(id) {
         return html;
       }
       var html = "";
+      function cleanIp(ip) { return valOrDash(String(ip || "").replace(/\/\d+$/, "")); }
       html += section("版本信息", [
-        ["系统版本", function () { return s.version; }],
-        ["采集程序", function () { return s.read_version; }],
-        ["客户端程序", function () { return s.rtu_version; }],
-        ["Web 管理", function () { return s.cgi_version; }]
+        ["系统版本", function () { return valOrDash(s.version); }],
+        ["采集程序", function () { return valOrDash(s.read_version); }],
+        ["客户端程序", function () { return valOrDash(s.rtu_version); }],
+        ["Web 管理", function () { return valOrDash(s.cgi_version); }]
       ]);
       html += section("运行与资源", [
         ["已运行时间", function () { return fmtUptime(s.uptime); }],
         ["内存总量", function () { return fmtBytes(s.memtotal); }],
         ["空闲内存", function () { return fmtBytes(s.memfree); }],
+        ["内存使用率", function () {
+          return s.memtotal ? (Math.round((1 - s.memfree / s.memtotal) * 1000) / 10) + "%" : "-";
+        }],
         ["磁盘总量", function () { return fmtBytes(s.disktotal); }],
         ["磁盘剩余", function () { return fmtBytes(s.diskfree); }],
         ["存储使用率", function () {
@@ -158,15 +165,16 @@ function hideMsg(id) {
         }]
       ]);
       html += section("网络", [
-        ["MAC 地址", function () { return s.mac; }],
-        ["IP 地址", function () { return s.ip; }],
-        ["4G 内网 IP", function () { return s.gprs_ip; }]
+        ["MAC 地址", function () { return valOrDash(s.mac); }],
+        ["IP 地址", function () { return cleanIp(s.ip); }],
+        ["4G 内网 IP", function () { return valOrDash(s.gprs_ip); }]
       ]);
-      html += section("4G 通信", [
-        ["IMSI", function () { return s.gprs_imsi; }],
-        ["CCID (SIM 卡号)", function () { return s.gprs_ccid; }],
-        ["信号强度 CSQ", function () { return s.gprs_csq; }]
-      ]);
+      var has4g = s.gprs_imsi || s.gprs_ccid || s.gprs_csq;
+      html += section("4G 通信", has4g ? [
+        ["IMSI", function () { return valOrDash(s.gprs_imsi); }],
+        ["CCID (SIM 卡号)", function () { return valOrDash(s.gprs_ccid); }],
+        ["信号强度 CSQ", function () { return valOrDash(s.gprs_csq); }]
+      ] : [["状态", function () { return "未接入 4G 模块"; }]]);
       $("info-body").innerHTML = html;
     }).catch(function (e) {
       $("info-body").innerHTML = '<div class="msg error">' + esc(e.message) + "</div>";
