@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RTU 设备管理</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 登录页面 -->
+<div id="login-page" class="login-page hidden">
+  <div class="login-box">
+    <h1>RTU 设备管理</h1>
+    <p class="login-sub">远程终端单元配置系统</p>
+    <div class="form-row">
+      <label>用户名</label>
+      <input type="text" id="login-user" placeholder="请输入用户名">
+    </div>
+    <div class="form-row">
+      <label>密  码</label>
+      <input type="password" id="login-pass" placeholder="请输入密码">
+    </div>
+    <button id="btn-login" class="btn btn-primary btn-block">登 录</button>
+    <div id="login-msg" class="msg error hidden"></div>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div id="main-page" class="main-page hidden">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <h1>RTU 管理</h1>
+    </div>
+    <nav id="nav">
+      <a href="#/info" data-page="info" class="nav-item active">系统信息</a>
+      <a href="#/status" data-page="status" class="nav-item">运行状态</a>
+      <a href="#/base" data-page="base" class="nav-item">基础设置</a>
+      <a href="#/mqtt" data-page="mqtt" class="nav-item">MQTT 设置</a>
+      <a href="#/webapi" data-page="webapi" class="nav-item">WebAPI 设置</a>
+      <a href="#/iot" data-page="iot" class="nav-item">传感器管理</a>
+      <a href="#/power" data-page="power" class="nav-item">电源控制器</a>
+      <a href="#/his" data-page="his" class="nav-item">历史数据</a>
+      <a href="#/test" data-page="test" class="nav-item">测试工具</a>
+    </nav>
+    <div class="sidebar-foot">
+      <button id="btn-logout" class="btn btn-outline btn-block">退出登录</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div id="page-info" class="page hidden">
+      <h2>系统信息</h2>
+      <button id="info-refresh" class="btn btn-primary">刷新</button>
+      <div id="info-body" class="kv-grid"></div>
+    </div>
+
+    <div id="page-status" class="page hidden">
+      <h2>运行状态</h2>
+      <button id="status-refresh" class="btn btn-primary">刷新</button>
+      <div id="status-body" class="kv-grid"></div>
+    </div>
+
+    <div id="page-base" class="page hidden">
+      <h2>基础设置</h2>
+      <div class="form">
+        <div class="form-row"><label>设备编号 (id)</label><input type="text" id="base-id"></div>
+        <div class="form-row"><label>所属单位 (uint)</label><input type="text" id="base-uint"></div>
+        <div class="form-row"><label>传感器数量 (iotnumber)</label><input type="number" id="base-iotnumber" min="0"></div>
+        <div class="form-row"><label>数据存储目录 (datadir)</label><input type="text" id="base-datadir"></div>
+        <div class="form-row"><button id="base-save" class="btn btn-primary">保存</button></div>
+      </div>
+    </div>
+
+    <div id="page-mqtt" class="page hidden">
+      <h2>MQTT 设置</h2>
+      <div class="form">
+        <div class="form-row"><label>启用 MQTT</label><select id="mqtt-used"><option value="true">启用</option><option value="false">停用</option></select></div>
+        <div class="form-row"><label>服务器地址 (host)</label><input type="text" id="mqtt-host"></div>
+        <div class="form-row"><label>端口 (port)</label><input type="number" id="mqtt-port" min="1" max="65535"></div>
+        <div class="form-row"><label>发布主题 (pubtoptic)</label><input type="text" id="mqtt-topic"></div>
+        <div class="form-row"><label>用户名 (username)</label><input type="text" id="mqtt-username"></div>
+        <div class="form-row"><label>密码 (password)</label><input type="password" id="mqtt-password"></div>
+        <div class="form-row"><button id="mqtt-save" class="btn btn-primary">保存</button></div>
+      </div>
+    </div>
+
+    <div id="page-webapi" class="page hidden">
+      <h2>WebAPI 设置</h2>
+      <div class="form">
+        <div class="form-row"><label>启用 WebAPI</label><select id="webapi-used"><option value="true">启用</option><option value="false">停用</option></select></div>
+        <div class="form-row"><label>服务器地址 (url)</label><input type="text" id="webapi-url"></div>
+        <div class="form-row"><label>认证 Token</label><input type="text" id="webapi-token"></div>
+        <div class="form-row"><button id="webapi-save" class="btn btn-primary">保存</button></div>
+      </div>
+    </div>
+
+    <div id="page-iot" class="page hidden">
+      <h2>传感器管理</h2>
+      <div class="toolbar">
+        <button id="iot-refresh" class="btn btn-secondary">刷新列表</button>
+        <button id="iot-add" class="btn btn-primary">新增传感器</button>
+        <button id="iot-load-type" class="btn btn-secondary">从类型模板加载</button>
+      </div>
+      <table id="iot-list" class="table">
+        <thead><tr><th>编号</th><th>名称</th><th>类型</th><th>串口</th><th>周期</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="iot-edit" class="card hidden">
+        <h3 id="iot-edit-title">编辑传感器</h3>
+        <div class="form form-grid">
+          <div class="form-row"><label>编号 (iot)</label><input type="number" id="iot-iot"></div>
+          <div class="form-row"><label>名称 (id)</label><input type="text" id="iot-id"></div>
+          <div class="form-row"><label>类型 (type)</label><input type="text" id="iot-type"></div>
+          <div class="form-row"><label>采集周期 (cron)</label><input type="text" id="iot-cron" placeholder="如:0 * * * * *"></div>
+          <div class="form-row"><label>串口 (com)</label><input type="text" id="iot-com" placeholder="如:1 表示 /dev/ttyS1"></div>
+          <div class="form-row"><label>波特率 (baudrate)</label><input type="number" id="iot-baudrate"></div>
+          <div class="form-row"><label>数据位 (databits)</label><input type="number" id="iot-databits"></div>
+          <div class="form-row"><label>停止位 (stopbits)</label><input type="number" id="iot-stopbits"></div>
+          <div class="form-row"><label>校验位 (paritymode)</label><select id="iot-paritymode">
+            <option value="0">无校验</option><option value="1">奇校验</option><option value="2">偶校验</option>
+          </select></div>
+          <div class="form-row"><label>读取指令 (read_buff, 十六进制)</label><input type="text" id="iot-readbuff"></div>
+          <div class="form-row"><label>发送长度 (read_len)</label><input type="number" id="iot-readlen" min="0"></div>
+          <div class="form-row"><label>发送延时 (read_delay, ms)</label><input type="number" id="iot-readdelay" min="0"></div>
+          <div class="form-row"><label>接收长度 (recive_len)</label><input type="number" id="iot-reciven" min="0"></div>
+          <div class="form-row"><label>取数个数 (revive_data_len)</label><input type="number" id="iot-revivedatalen" min="0"></div>
+          <div class="form-row"><label>取数位置 (revive_data, 逗号分隔)</label><input type="text" id="iot-revivedata" placeholder="如:3,4"></div>
+          <div class="form-row"><label>计算偏移 (offset)</label><select id="iot-offset"><option value="true">是</option><option value="false">否</option></select></div>
+          <div class="form-row"><label>比例系数 (ratio)</label><input type="number" step="0.001" id="iot-ratio"></div>
+          <div class="form-row"><label>校验方式 (crc)</label><select id="iot-crc"><option value="CRC16">CRC16</option><option value="XOR">XOR</option></select></div>
+        </div>
+        <div class="form-row btn-row">
+          <button id="iot-edit-save" class="btn btn-primary">保存</button>
+          <button id="iot-edit-test" class="btn btn-secondary">串口测试</button>
+          <button id="iot-edit-cancel" class="btn btn-outline">取消</button>
+        </div>
+        <div id="iot-edit-msg" class="msg hidden"></div>
+      </div>
+    </div>
+
+    <div id="page-power" class="page hidden">
+      <h2>电源控制器</h2>
+      <div class="toolbar">
+        <button id="power-info" class="btn btn-secondary">设备信息</button>
+        <button id="power-data" class="btn btn-secondary">运行数据</button>
+        <button id="power-set" class="btn btn-secondary">参数设置</button>
+        <button id="power-capacity" class="btn btn-primary">设置电池容量/类型</button>
+      </div>
+      <div id="power-body" class="card hidden"></div>
+    </div>
+
+    <div id="page-his" class="page hidden">
+      <h2>历史数据查询</h2>
+      <div class="form form-inline">
+        <div class="form-row"><label>传感器</label><select id="his-iot"></select></div>
+        <div class="form-row"><label>日期</label><input type="date" id="his-day"></div>
+        <button id="his-day-query" class="btn btn-primary">查询日数据</button>
+        <div class="form-row"><label>时间</label><input type="datetime-local" id="his-time"></div>
+        <button id="his-one-query" class="btn btn-secondary">查询最近数据</button>
+      </div>
+      <div id="his-msg" class="msg hidden"></div>
+      <table id="his-table" class="table hidden">
+        <thead><tr><th>时间</th><th>名称</th><th>类型</th><th>数值</th><th>偏移</th><th>原始数据</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="page-test" class="page hidden">
+      <h2>测试工具</h2>
+      <div class="card">
+        <h3>MQTT 连接测试</h3>
+        <button id="test-mqtt" class="btn btn-primary">测试 MQTT 服务器</button>
+      </div>
+      <div class="card">
+        <h3>WebAPI 连接测试</h3>
+        <button id="test-webapi" class="btn btn-primary">测试 WebAPI 服务器</button>
+      </div>
+      <div class="card">
+        <h3>串口读取测试</h3>
+        <div class="form form-inline">
+          <div class="form-row"><label>选择传感器</label><select id="test-read-id"></select></div>
+          <button id="test-read" class="btn btn-primary">串口读取测试</button>
+        </div>
+        <div id="test-read-body" class="kv-grid hidden"></div>
+      </div>
+      <div id="test-msg" class="msg hidden"></div>
+    </div>
+  </main>
+</div>
+
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
