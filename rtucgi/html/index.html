@@ -38,9 +38,14 @@
       <a href="#/status" data-page="status" class="nav-item">运行状态</a>
       <a href="#/base" data-page="base" class="nav-item">基础设置</a>
       <a href="#/network" data-page="network" class="nav-item">网络设置</a>
-      <a href="#/mqtt" data-page="mqtt" class="nav-item">MQTT 设置</a>
-      <a href="#/webapi" data-page="webapi" class="nav-item">WebAPI 设置</a>
-      <a href="#/iot" data-page="iot" class="nav-item">传感器管理</a>
+      <div class="nav-group" data-pages="iot,mqtt,webapi">
+        <a href="javascript:void(0)" class="nav-item nav-toggle" data-toggle="nav-sub-acq">自动采集设置<span class="nav-arrow">▸</span></a>
+        <div class="nav-sub hidden" id="nav-sub-acq">
+          <a href="#/iot" data-page="iot" class="nav-item nav-item-sub">传感器管理</a>
+          <a href="#/mqtt" data-page="mqtt" class="nav-item nav-item-sub">MQTT 设置</a>
+          <a href="#/webapi" data-page="webapi" class="nav-item nav-item-sub">WebAPI 设置</a>
+        </div>
+      </div>
       <a href="#/power" data-page="power" class="nav-item">电源控制器</a>
       <a href="#/his" data-page="his" class="nav-item">历史数据</a>
       <a href="#/test" data-page="test" class="nav-item">测试工具</a>
