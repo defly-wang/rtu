@@ -8,3 +8,6 @@ GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" -o rtucgi.cgi
 
 # 将编译后的文件复制到目标目录
 cp rtucgi.cgi ../install/cgi/rtucgi.cgi.new
+
+# 将HTML文件复制到安装目录
+cp html/* ../install/html/

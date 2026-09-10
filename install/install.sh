@@ -12,7 +12,12 @@ cp etc/* /etc/rtu/ -rf
 cp cgi/* /usr/boa/www/cgi-bin/
 chmod a+x /usr/boa/www/cgi-bin/rtucgi.cgi
 
+cp html/* /usr/boa/www/
+
 
 cp autorun/rc.S /etc/init.d/
+
+
+cp net/* /mnt/yaffs2/ 
 
 reboot
