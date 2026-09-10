@@ -525,16 +525,24 @@ function hideMsg(id) {
     $("login-user").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
     $("btn-logout").addEventListener("click", doLogout);
 
-    document.querySelectorAll("#nav .nav-item").forEach(function (a) {
-      a.addEventListener("click", function (e) {
-        e.preventDefault();
-        if (a.classList.contains("nav-toggle")) {
-          toggleNavGroup(a);
-        } else {
-          location.hash = "#/" + a.dataset.page;
-          navigate(a.dataset.page);
-        }
-      });
+    var navEl = $("nav");
+    navEl.addEventListener("click", function (e) {
+      var t = e.target, a = null;
+      if (t && t.closest) {
+        a = t.closest(".nav-item");
+      } else {
+        var n = t;
+        while (n && n !== navEl && n.classList && !n.classList.contains("nav-item")) n = n.parentNode;
+        if (n && n !== navEl && n.classList && n.classList.contains("nav-item")) a = n;
+      }
+      if (!a) return;
+      e.preventDefault();
+      if (a.classList.contains("nav-toggle")) {
+        toggleNavGroup(a);
+      } else if (a.dataset.page) {
+        location.hash = "#/" + a.dataset.page;
+        navigate(a.dataset.page);
+      }
     });
 
     window.addEventListener("hashchange", function () {
