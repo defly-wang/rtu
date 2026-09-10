@@ -20,6 +20,43 @@ type Config struct {
 	Webapi WebapiConfig      `toml:"webapi"`
 }
 
+type RtuClientConfig struct {
+	Server      string `toml:"server"`
+	Port        int    `toml:"port"`
+	Signaldelay int    `toml:"signaldelay"`
+	Retrydelay  int    `toml:"retrydelay"`
+	Watchdog    bool   `toml:"watchdog"`
+}
+
+type Serial2EthernetMode int
+
+const (
+	Serial2EthernetModeClient Serial2EthernetMode = iota
+	Serial2EthernetModeServer
+)
+
+type RegisterMode int
+
+const (
+	RegisterModeLink RegisterMode = iota
+	RegisterModeLoop
+)
+
+type Serial2Ethernet struct {
+	Mode         Serial2EthernetMode `toml:"mode"`
+	Server       string              `toml:"server"`
+	Port         int                 `toml:"port"`
+	ListenPort   int                 `toml:"listenport"`
+	Protocol     string              `toml:"protocol"`
+	Com          string              `toml:"com"`
+	Baudrate     int                 `toml:"baudrate"`
+	Databits     int                 `toml:"databits"`
+	Stopbits     int                 `toml:"stopbits"`
+	Parity       string              `toml:"parity"`
+	RegisterMode RegisterMode        `toml:"registermode"`
+	RegisterData string              `toml:"registerdata"`
+}
+
 type WebapiConfig struct {
 	Url   string `json:"url"`
 	Token string `json:"token"`
@@ -77,6 +114,7 @@ const (
 const (
 	CONFIG_FILE       = "iotread.toml"
 	CONFIG_RTU_FILE   = "rtuclient.toml"
+	CONFIG_S2E_FILE   = "s2eclient.toml"
 	CONFIG_POWER_FILE = "power.toml"
 )
 
